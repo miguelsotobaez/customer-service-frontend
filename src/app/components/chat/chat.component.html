@@ -1,20 +1,32 @@
-<div *ngIf="!representativeName" class="chat-button">
-    <button (click)="getRepresentative()">Start Chat</button>
-  </div>
-  
-  <div *ngIf="representativeName" class="chat-modal">
-    <h3>Chat with {{ representativeName }}</h3>
-  
+<!-- Botón para iniciar el chat -->
+<div *ngIf="!representativeName" class="flex justify-center items-center h-screen bg-gray-800 text-white">
+  <button (click)="getRepresentative()" class="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700 transition">Start Chat</button>
+</div>
+
+<!-- Modal de chat -->
+<div *ngIf="representativeName" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 text-white">
+  <div class="bg-gray-900 p-6 rounded-lg shadow-lg w-full max-w-md">
+    <h3 class="text-xl font-semibold mb-4">Chat with {{ representativeName }}</h3>
+
+    <!-- Selección de tema -->
     <div *ngIf="!depthReached">
-      <h4>Select a topic:</h4>
-      <ul>
-        <li *ngFor="let topic of topics" (click)="selectTopic(topic)">
+      <h4 class="text-lg font-semibold mb-2">Select a topic:</h4>
+      <ul class="list-disc pl-5">
+        <li *ngFor="let topic of topics" (click)="selectTopic(topic)" class="cursor-pointer hover:text-blue-400">
           {{ topic.name }}
         </li>
       </ul>
     </div>
-  
-    <div *ngIf="depthReached">
+
+    <!-- Mensaje de agradecimiento -->
+    <div *ngIf="depthReached" class="text-center">
       <p>Thank you for your questions!</p>
+      <button (click)="startAgain()" class="mt-4 px-4 py-2 bg-blue-600 rounded hover:bg-blue-700 transition">Start Again</button>
+    </div>
+
+    <!-- Botón para volver -->
+    <div *ngIf="showBackButton()" class="mt-4">
+      <button (click)="goBack()" class="px-4 py-2 bg-gray-600 rounded hover:bg-gray-700 transition">Go Back</button>
     </div>
   </div>
+</div>
