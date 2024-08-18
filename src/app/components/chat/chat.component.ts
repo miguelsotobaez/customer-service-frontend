@@ -17,21 +17,32 @@ interface Topic {
 })
 export class ChatComponent {
   representativeName: string | null = null;
+  representativeImage: string | null = null;
   topics: Topic[] = [];
   selectedTopic: Topic | null = null;
   depthReached = false;
   topicHistory: Topic[] = [];  // History of topics
   atFirstLevel = true;         // Indicator for first level
 
+  private representativeId: number | null = null;
+
   constructor(private http: HttpClient) {}
 
-  // Method to get the available representative
   getRepresentative() {
-    this.http.get<{ name: string }>('http://localhost:3000/customer/available')
+    this.http.get<{ id: number; name: string }>('http://localhost:3000/customer/available')
       .subscribe(response => {
         this.representativeName = response.name;
+        this.representativeId = response.id;
+        this.loadRepresentativeImage(); // Fetch image based on representative ID
         this.loadTopics();
       });
+  }
+
+  loadRepresentativeImage() {
+    if (this.representativeId !== null) {
+      // Construct image path using ID
+      this.representativeImage = `assets/profile-pictures/${this.representativeId}.jpeg`;
+    }
   }
 
   // Method to load topics
