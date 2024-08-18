@@ -1,0 +1,20 @@
+<div *ngIf="!representativeName" class="chat-button">
+    <button (click)="getRepresentative()">Start Chat</button>
+  </div>
+  
+  <div *ngIf="representativeName" class="chat-modal">
+    <h3>Chat with {{ representativeName }}</h3>
+  
+    <div *ngIf="!depthReached">
+      <h4>Select a topic:</h4>
+      <ul>
+        <li *ngFor="let topic of topics" (click)="selectTopic(topic)">
+          {{ topic.name }}
+        </li>
+      </ul>
+    </div>
+  
+    <div *ngIf="depthReached">
+      <p>Thank you for your questions!</p>
+    </div>
+  </div>
