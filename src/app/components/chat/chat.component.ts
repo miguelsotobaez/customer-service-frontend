@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { ChatService } from '../../services/chat.service';
 import { FormsModule } from '@angular/forms';
 
 interface Topic {
@@ -11,7 +11,7 @@ interface Topic {
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.css']
 })
@@ -26,16 +26,20 @@ export class ChatComponent {
 
   private representativeId: number | null = null;
 
-  constructor(private http: HttpClient) {}
+  constructor(private chatService: ChatService) {}
 
   getRepresentative() {
-    this.http.get<{ id: number; name: string }>('http://localhost:3000/customer/available')
-      .subscribe(response => {
+    this.chatService.getAvailableRepresentative().subscribe(
+      (response) => {
         this.representativeName = response.name;
         this.representativeId = response.id;
-        this.loadRepresentativeImage(); // Fetch image based on representative ID
-        this.loadTopics();
-      });
+        this.loadRepresentativeImage();
+        this.loadTopics(); // Load topics after getting the representative
+      },
+      (error) => {
+        console.error('Error fetching representative:', error);
+      }
+    );
   }
 
   loadRepresentativeImage() {
@@ -47,11 +51,19 @@ export class ChatComponent {
 
   // Method to load topics
   loadTopics() {
-    this.http.get<Topic[]>('http://localhost:3000/topics')
-      .subscribe(response => {
+    this.chatService.getTopics().subscribe(
+      (response) => {
         this.topics = response;
+        this.topicHistory = [];
+        this.selectedTopic = null;
+        this.depthReached = false;
+        this.atFirstLevel = true;
         this.resetState();
-      });
+      },
+      (error) => {
+        console.error('Error fetching topics:', error);
+      }
+    );
   }
 
   // Method to handle topic selection

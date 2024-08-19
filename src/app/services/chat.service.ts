@@ -1,17 +1,18 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ChatService {
-  private apiUrl = 'http://localhost:3000'; // Ajusta la URL según la configuración de tu backend
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
-  getAvailableRepresentative(): Observable<{ name: string; isAvailable: boolean }> {
-    return this.http.get<{ name: string; isAvailable: boolean }>(`${this.apiUrl}/customer/available`);
+  getAvailableRepresentative(): Observable<{ id: number, name: string; isAvailable: boolean }> {
+    return this.http.get<{ id: number, name: string; isAvailable: boolean }>(`${this.apiUrl}/customer/available`);
   }
 
   getTopics(): Observable<any[]> {
