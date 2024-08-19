@@ -13,7 +13,7 @@ interface Topic {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './chat.component.html',
-  styleUrls: ['./chat.component.css']
+  styleUrls: ['./chat.component.css'],
 })
 export class ChatComponent {
   representativeName: string | null = null;
@@ -21,14 +21,16 @@ export class ChatComponent {
   topics: Topic[] = [];
   selectedTopic: Topic | null = null;
   depthReached = false;
-  topicHistory: Topic[] = [];  // History of topics
-  atFirstLevel = true;         // Indicator for first level
+  topicHistory: Topic[] = []; // History of topics
+  atFirstLevel = true; // Indicator for first level
+  isLoading = false; // State to control the spinner
 
   private representativeId: number | null = null;
 
   constructor(private chatService: ChatService) {}
 
   getRepresentative() {
+    this.isLoading = true; // Show the spinner
     this.chatService.getAvailableRepresentative().subscribe(
       (response) => {
         this.representativeName = response.name;
@@ -38,6 +40,9 @@ export class ChatComponent {
       },
       (error) => {
         console.error('Error fetching representative:', error);
+      },
+      () => {
+        this.isLoading = false; // Hide the spinner
       }
     );
   }
@@ -62,6 +67,9 @@ export class ChatComponent {
       },
       (error) => {
         console.error('Error fetching topics:', error);
+      },
+      () => {
+        this.isLoading = false; // Hide the spinner
       }
     );
   }
@@ -69,7 +77,7 @@ export class ChatComponent {
   // Method to handle topic selection
   selectTopic(topic: Topic) {
     if (this.selectedTopic && !this.atFirstLevel) {
-      this.topicHistory.push(this.selectedTopic);  // Save the current topic in history
+      this.topicHistory.push(this.selectedTopic); // Save the current topic in history
     }
 
     this.selectedTopic = topic;
@@ -84,7 +92,9 @@ export class ChatComponent {
       this.selectedTopic = this.topicHistory.pop() || null;
       this.topics = this.selectedTopic?.suggestions || [];
       this.depthReached = !this.topics.length;
-      this.atFirstLevel = this.topicHistory.length === 0 && this.topicHistory[0] == this.selectedTopic ;
+      this.atFirstLevel =
+        this.topicHistory.length === 0 &&
+        this.topicHistory[0] == this.selectedTopic;
     } else {
       this.loadTopics();
     }
@@ -93,7 +103,7 @@ export class ChatComponent {
   // Method to handle the "Start Again" button
   startAgain() {
     this.representativeName = null;
-    this.loadTopics();  // Reload topics to start the chat again
+    this.loadTopics(); // Reload topics to start the chat again
   }
 
   // Method to determine if the "Go Back" button should be shown
