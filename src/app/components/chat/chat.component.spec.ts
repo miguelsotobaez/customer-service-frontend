@@ -59,11 +59,7 @@ describe('ChatComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ChatComponent],
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(), // Proporciona el backend de pruebas de HTTP
-        ChatService,
-      ],
+      providers: [provideHttpClient(), provideHttpClientTesting(), ChatService],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ChatComponent);
@@ -85,7 +81,6 @@ describe('ChatComponent', () => {
   });
 
   it('should fetch a representative and load topics', () => {
-    // Simular la respuesta del representante disponible
     component.getRepresentative();
 
     const reqRep = httpTestingController.expectOne((req) =>
@@ -122,50 +117,39 @@ describe('ChatComponent', () => {
       statusText: 'Internal Server Error',
     });
 
-    // Verifica que console.error fue llamado con el mensaje esperado
     expect(consoleSpy).toHaveBeenCalledWith(
       'Error fetching representative:',
-      jasmine.any(HttpErrorResponse) // Cambia a HttpErrorResponse
+      jasmine.any(HttpErrorResponse)
     );
 
-    // Además, puedes verificar las propiedades específicas del error si es necesario
     const errorArg = consoleSpy.calls.mostRecent().args[1];
     expect(errorArg.status).toBe(500);
     expect(errorArg.statusText).toBe('Internal Server Error');
   });
 
   it('should handle topic selection and go back', () => {
-    // Configura los temas en el componente
     component.topics = mockTopics;
 
-    // Selecciona un tema
     component.selectTopic(mockTopics[0]);
 
-    // Verifica que el tema seleccionado sea el esperado
     expect(component.selectedTopic).toEqual(mockTopics[0]);
     expect(component.topics).toEqual(mockTopics[0].suggestions);
     expect(component.depthReached).toBe(false);
 
-    // Selecciona un subtema
     component.selectTopic(mockTopics[0].suggestions[0]);
 
-    // Verifica que el subtema seleccionado sea el esperado
     expect(component.selectedTopic).toEqual(mockTopics[0].suggestions[0]);
     expect(component.topics).toEqual(mockTopics[0].suggestions[0].suggestions);
     expect(component.depthReached).toBe(false);
 
-    // Vuelve atrás
     component.goBack();
 
-    // Verifica el estado después de volver atrás
     expect(component.selectedTopic).toEqual(mockTopics[0]);
     expect(component.topics).toEqual(mockTopics[0].suggestions);
     expect(component.depthReached).toBe(false);
 
-    // Vuelve atrás de nuevo
     component.goBack();
 
-    // Verifica el estado después de volver atrás de nuevo
     expect(component.selectedTopic).toEqual(mockTopics[0]);
     expect(component.topics).toEqual(mockTopics[0].suggestions);
     expect(component.atFirstLevel).toBe(false);
@@ -183,38 +167,31 @@ describe('ChatComponent', () => {
   });
 
   it('should reset the chat when "Start Again" is clicked', () => {
-    // Inicializa la solicitud de representante
     component.getRepresentative();
 
-    // Simula la respuesta del representante disponible
     const reqRep = httpTestingController.expectOne((req) =>
       req.url.endsWith('/api/customer/available')
     );
     expect(reqRep.request.method).toBe('GET');
     reqRep.flush({ id: 1, name: 'Alice', isAvailable: true });
 
-    // Inicializa la solicitud de temas
     const reqTopics = httpTestingController.expectOne((req) =>
       req.url.endsWith('/api/topics')
     );
     expect(reqTopics.request.method).toBe('GET');
     reqTopics.flush(mockTopics);
 
-    // Verifica los valores iniciales
     expect(component.representativeName).toBe('Alice');
     expect(component.topics.length).toBeGreaterThan(0);
 
-    // Llama al método startAgain
     component.startAgain();
 
-    // Espera y maneja la solicitud de nuevo tema después de llamar startAgain
     const reqStartAgainTopics = httpTestingController.expectOne((req) =>
       req.url.endsWith('/api/topics')
     );
     expect(reqStartAgainTopics.request.method).toBe('GET');
     reqStartAgainTopics.flush(mockTopics);
 
-    // Verifica los valores después de llamar startAgain
     expect(component.representativeName).toBeNull();
     expect(component.topics.length).toBeGreaterThan(0);
   });

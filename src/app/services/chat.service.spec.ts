@@ -65,7 +65,6 @@ describe('ChatService', () => {
   });
 
   afterEach(() => {
-    // Verifica que no haya solicitudes HTTP pendientes
     httpTestingController.verify();
   });
 
@@ -78,13 +77,11 @@ describe('ChatService', () => {
       expect(rep).toEqual(mockRepresentative);
     });
 
-    // Verificar que la solicitud se haya hecho al endpoint correcto
     const req = httpTestingController.expectOne(
       `${environment.apiUrl}/customer/available`
     );
     expect(req.request.method).toBe('GET');
 
-    // Responder con los datos simulados
     req.flush(mockRepresentative);
   });
 
@@ -93,11 +90,9 @@ describe('ChatService', () => {
       expect(topics).toEqual(mockTopics);
     });
 
-    // Verificar que la solicitud se haya hecho al endpoint correcto
     const req = httpTestingController.expectOne(`${environment.apiUrl}/topics`);
     expect(req.request.method).toBe('GET');
 
-    // Responder con los datos simulados
     req.flush(mockTopics);
   });
 
@@ -111,7 +106,6 @@ describe('ChatService', () => {
       }
     );
 
-    // Simular un error en la solicitud
     const req = httpTestingController.expectOne(
       `${environment.apiUrl}/customer/available`
     );
@@ -120,7 +114,7 @@ describe('ChatService', () => {
       statusText: 'Internal Server Error',
     });
 
-    expect(consoleSpy).not.toHaveBeenCalled(); // No deberías manejar errores en el servicio en este caso
+    expect(consoleSpy).not.toHaveBeenCalled();
   });
 
   it('should handle error when getting topics', () => {
@@ -133,13 +127,12 @@ describe('ChatService', () => {
       }
     );
 
-    // Simular un error en la solicitud
     const req = httpTestingController.expectOne(`${environment.apiUrl}/topics`);
     req.flush('Not Found', {
       status: 404,
       statusText: 'Not Found',
     });
 
-    expect(consoleSpy).not.toHaveBeenCalled(); // No deberías manejar errores en el servicio en este caso
+    expect(consoleSpy).not.toHaveBeenCalled();
   });
 });

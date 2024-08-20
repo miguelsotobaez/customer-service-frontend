@@ -15,10 +15,7 @@ describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent, ChatComponent],
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(), // Proporciona el backend de pruebas de HTTP
-      ],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AppComponent);
@@ -27,13 +24,10 @@ describe('AppComponent', () => {
   });
 
   afterEach(() => {
-    // Verifica que no queden solicitudes pendientes después de cada prueba
     httpTestingController.verify();
   });
 
   it('should create the app', () => {
     expect(component).toBeTruthy();
   });
-
-  // Agrega más pruebas según sea necesario
 });
